@@ -2,6 +2,10 @@ body {
 	background-color: #9B59B6;
 }
 
+.action.action {
+	background-color: #e74c3c;
+}
+
 li:nth-child(8n+1) {
 	background-color: #1ABC9C;
 }
@@ -60,6 +64,7 @@ li, li > a {
 	margin: 0px;
 	height: 89px;
 	width: 100%;
+	white-space: nowrap;
 
 	color: white;
 	text-align: center;

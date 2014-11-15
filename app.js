@@ -1,72 +1,77 @@
 
-var debug = require('debug')('http');
+var debug = require('debug')('YoClicker:http');
 var http = require('http');
 var express = require('express');
 var app = express();
 var PoolCache = require('./PoolCache');
-
-var BACKEND_URL = 'http://1ad4da90.ngrok.com';
+var utils = require('./utils');
 
 app.use('/', express.static(__dirname + '/public'));
-
 app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
 
-function getJSON(url, cb)
-{
-	http.get(url, function (res)
-	{
-		var body = '';
-		res.on('data', function (chunk) {
-			body += chunk;
-		});
-		res.on('end', function () {
-			var obj = {};
-			try {
-				obj = JSON.parse(body);
-			} catch (e) {
-				cb("wololo");
-			}
-			cb(null, obj);
-		});
-	});
-}
-
-app.param('pid', function (req, res, next, pid) {
-
-	req.pid = pid;
-
-	var poolData = PoolCache.get(pid);
-	if (poolData != null) {
-		req.poolData = poolData;
-		return next();
-	}
-
-	/**
-	 * poolData object should look like:
-	 *   options: <int>
-	 */
-	debug('getting pool data from backend');
-	getJSON(BACKEND_URL + '/pool/' + pid, function (err, obj) {
-		if (err) return res.status(500).send({ error: 'something blew up' });
-		PoolCache.save(pid, obj);
-		req.poolData = obj
-		next();
-	});
-
-});
+/**
+ * Parameters
+ */
 
 app.param('uid', function (req, res, next, uid) {
 	req.uid = uid;
 	next();
 });
 
-app.get('/voter/:pid/:uid', function (req, res) {
+app.param('pid', function (req, res, next, pid) {
+
+	req.pid = pid;
+
+	PoolCache.get(pid, function (err, poolData) {
+		if (err) return next(err);
+		req.poolData = poolData;
+		next();
+	});
+
+});
+
+app.param('vid', function (req, res, next, vid) {
+	req.vid = vid;
+	next();
+});
+
+/* Routes */
+
+app.get('/voter/:pollName/:vid', function (req, res) {
 	debug('the voter!');
 	res.render('voter', {
 		options: req.poolData.options,
 		voteURL: BACKEND_URL + '/vote/' + req.pid + '/' + req.uid + '/'
 	});
+});
+
+app.get('/create/:uid', function (req, res) {
+	res.render('create');
+})
+
+app.get('/dashboard/:uid', function (req, res) {
+	res.render('dashboard', {
+		uid: req.uid,
+		username: 'MLLOBET',
+		polls: [{
+			name: 'DOTJS2014',
+			pid: 937124
+		},
+		{
+			name: 'DOTSWIFT2015',
+			pid: 128576
+		}]
+	});
+});
+
+app.get('*', function (req, res) {
+	res.render('error', {statusCode: 404})
+});
+
+app.use(function(err, req, res, next){
+	debug(err);
+    res.render('error', {statusCode: err.message});
 });
 
 app.listen(3000);

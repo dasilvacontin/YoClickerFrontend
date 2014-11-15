@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <title>YoClicker - Dashboard</title>
+  <%- include head.ejs %>
+  <head>
+  </head>
+  <body>
+    <ul>
+      <li>HI <%= username %></li>
+      <li>CREATE NEW POLL</li>
+	<% for (var i = 0; i < polls.length; ++i) { %>
+	  <li>
+	  	<a href="<%= '/edit/'+polls[i].pid+'/'+uid %>">
+          <%= polls[i].name %>
+        </a>
+	  </li>
+	<% } %>
+    </ul>
+  </body>
+</html>
