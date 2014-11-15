@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <title>YoClicker - Voter</title>
+  <%- include head.ejs %>
+  <head>
+  </head>
+  <body>
+    <ul>
+      <li>YOCLICKER</li>
+    <% var codeA = 'A'.charCodeAt(0) %>
+    <% for (var i = 0; i < options; i++) {%>
+      <li>
+        <a href="<%= voteURL + i %>">
+          <%= String.fromCharCode(codeA + i) %>
+        </a>
+      </li>
+    <% } %>
+    </ul>
+  </body>
+</html>
