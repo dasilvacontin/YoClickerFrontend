@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <title>YoClicker - New Poll</title>
+  <%- include head.ejs %>
+  <head>
+  </head>
+  <body>
+
+    <form action="" method="post">
+    <ul id="list">
+      <li>
+        <input id="pollName" type="text" name="pollName" placeholder="POLL NAME">
+      </li>
+      <li id="addQuestionButton">+</li>
+      <li>
+        <input id="savePollButton" type="submit" value="SAVE">
+      </li>
+      <li class="action">
+        <a href="<%= '/dashboard/'+uid %>">BACK</a>
+      </li>
+    </ul>
+    </form>
+
+    <div id="questionEditor" class="hide">
+      <ul id="questionList">
+        <li>
+          <input id="questionName" type="text" placeholder="NEW QUESTION">
+        </li>
+        <li id="addAnswerButton">+</li>
+        <li id="saveQuestionButton">SAVE</li>
+        <li id="deleteQuestionButton">DELETE</li>
+      </ul>
+    </div>
+
+  <script>
+
+    var savePollButton = document.getElementById('savePollButton');
+    var saveQuestionButton = document.getElementById('saveQuestionButton');
+    var list = document.getElementById('list');
+    var questionList = document.getElementById('questionList');
+    var addQuestionButton = document.getElementById('addQuestionButton');
+    var addAnswerButton = document.getElementById('addAnswerButton');
+    var deleteQuestionButton = document.getElementById('deleteQuestionButton');
+    var questionEditor = document.getElementById('questionEditor');
+
+    var pollName = document.getElementById('pollName');
+    var questionName = document.getElementById('questionName');
+
+    var questions = [];
+    var answerLis = [];
+    var answerInputs = [];
+
+    function addClass(d, c) {
+      d.className = d.className + " " + c;
+    }
+
+    function removeClass(d, c) {
+      d.className = d.className.replace(c,'')
+    }
+
+    var currentQuestion = undefined;
+    var currentQuestionIndex = -1;
+    function openQuestion(i) {
+
+      currentQuestion = questions[i];
+      currentQuestionIndex = i;
+
+      // Recreates answers
+      for (var i = 0; i < currentQuestion.answers.length; ++i)
+        addAnswer(currentQuestion.answers[i]);
+
+      questionName.value = currentQuestion.question;
+      addClass(list, 'hide');
+      removeClass(questionEditor, 'hide');
+
+      if (questionName.value == '') {
+        // first time question is opened
+        addAnswerButton.onclick();
+        addAnswerButton.onclick();
+        questionName.focus();
+      }
+    }
+
+    addQuestionButton.onclick = function () {
+      var li = document.createElement('li');
+      li.innerHTML = "new question";
+      var elem = list.insertBefore(li, addQuestionButton);
+      var i = questions.length;
+      elem.onclick = function () {
+        openQuestion(i);
+      };
+      questions.push({
+        question: '',
+        answers: [],
+        dom: li
+      });
+    };
+
+    function addAnswer (val) {
+      var li = document.createElement('li');
+      var input = document.createElement('input');
+      input.placeholder = 'new answer';
+      input.value = val;
+      li.appendChild(input);
+      var elem = questionList.insertBefore(li, addAnswerButton);
+      answerLis.push(li);
+      answerInputs.push(input);
+      return input;
+    }
+
+    addAnswerButton.onclick = function () {
+      var input = addAnswer('');
+      input.focus();
+    }
+
+    savePollButton.onclick = function (e) {
+      enforcement();
+      alert('Your poll needs questions');
+      e.preventDefault();
+    }
+
+    deleteQuestionButton.onclick = function () {
+      if (confirm('Are you sure you want to delete this question?')) {
+        for (var i = 0; i < answerLis.length; ++i) {
+          questionList.removeChild(answerLis[i]);
+        }
+
+      }
+    }
+
+    saveQuestionButton.onclick = function () {
+
+      // Saves question name
+      var val = questionName.value;
+      if (val.length == 0) {
+        alert("Your question needs a name");
+        return;
+      }
+      currentQuestion.question = val;
+      currentQuestion.dom.innerHTML = val;
+
+      // Saves answers and removes answers' dom elements
+      var a = [];
+      for (var i = 0; i < answerInputs.length; ++i) {
+        var ans = answerInputs[i];
+        a.push(ans.value);
+        questionList.removeChild(answerLis[i]);
+      }
+      answerInputs = [];
+      answerLis = [];
+      currentQuestion.answers = a;
+
+      addClass(questionEditor, 'hide');
+      removeClass(list, 'hide');
+
+    }
+
+    var SUFFIX = "+YCLK"
+    function enforcement() {
+      pollName.value = pollName.value.toUpperCase();
+      if (pollName.value.length > 0 && pollName.value.indexOf(SUFFIX) == -1) pollName.value += SUFFIX;
+    }
+
+    pollName.onblur = enforcement;
+
+  </script>
+  </body>
+</html>

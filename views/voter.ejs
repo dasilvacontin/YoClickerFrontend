@@ -6,12 +6,11 @@
   </head>
   <body>
     <ul>
-      <li>YOCLICKER</li>
-    <% var codeA = 'A'.charCodeAt(0) %>
-    <% for (var i = 0; i < options; i++) {%>
+      <li><%= pollName %></li>
+    <% for (var i = 0; i < questions.length; i++) {%>
       <li>
-        <a href="<%= voteURL + i %>">
-          <%= String.fromCharCode(codeA + i) %>
+        <a href="<%= '/voter/'+pollName+'/'+i+'/'+vid %>">
+          <%= questions[i].question %>
         </a>
       </li>
     <% } %>

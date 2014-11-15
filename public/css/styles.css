@@ -39,21 +39,23 @@ li:nth-child(8n) {
 }
 
 ul {
+	height: 100%;
+	width: 100%;
+
 	list-style-type: none;
 	padding: 0px;
 	margin: 0px;
+	overflow-x: hidden;
 }
 
-li {
-	cursor: default;
+li > a, input {
+	background-color: transparent;
 }
 
-li > a {
+li, li > a, input {
+
 	cursor: pointer;
-}
-
-li, li > a {
-
+	text-transform: uppercase;
 	display: block;
 	text-decoration: none;
 	line-height: 89px;
@@ -62,10 +64,39 @@ li, li > a {
 	font-size: 40px;
 	padding: 0px;
 	margin: 0px;
+	border: 0px;
 	height: 89px;
 	width: 100%;
 	white-space: nowrap;
 
 	color: white;
 	text-align: center;
+}
+
+/* http://stackoverflow.com/questions/2610497/change-an-inputs-html5-placeholder-color-with-css */
+*::-webkit-input-placeholder {
+    color: white;
+}
+*:-moz-placeholder {
+    /* FF 4-18 */
+    color: white;
+}
+*::-moz-placeholder {
+    /* FF 19+ */
+    color: white;
+}
+*:-ms-input-placeholder {
+    /* IE 10+ */
+    color: white;
+}
+
+input[type=text], textarea {
+  outline: none;
+  padding: 0px;
+  margin: 0px;
+  border: none;
+}
+
+.hide {
+	display: none;
 }

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <title>YoClicker - Question</title>
+  <%- include head.ejs %>
+  <head>
+  </head>
+  <body>
+    <ul>
+      <li><%= question %></li>
+    <% for (var i = 0; i < answers.length; i++) {%>
+      <li><a href="#" onclick="voteForAnswerWithIndex(<%= i %>)">
+          <%= answers[i] %>
+      </a></li>
+    <% } %>
+    <li class="action">
+      <a href="<%= '/voter/'+pollName+'/'+vid %>">BACK</a>
+    </li>
+    </ul>
+    <script type="text/javascript">
+      function voteForAnswerWithIndex(i) {
+        var voteRequest = new XMLHttpRequest();
+        voteRequest.open(
+          'POST',
+          "<%= '/poll/'+pollName+'/'+questionIndex+'/'%>"+i+"<%='/'+vid %>",
+          true
+        );
+        voteRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        voteRequest.send(i);
+      }
+    </script>
+  </body>
+</html>

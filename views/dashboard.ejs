@@ -7,14 +7,18 @@
   <body>
     <ul>
       <li>HI <%= username %></li>
-      <li>CREATE NEW POLL</li>
-	<% for (var i = 0; i < polls.length; ++i) { %>
-	  <li>
-	  	<a href="<%= '/edit/'+polls[i].pid+'/'+uid %>">
-          <%= polls[i].name %>
+  	<% for (var i = 0; polls && i < polls.length; ++i) { %>
+  	  <li>
+  	  	<a href="<%= '/edit/'+polls[i].pid+'/'+uid %>">
+            <%= polls[i].pollname %>
+          </a>
+  	  </li>
+  	<% } %>
+      <li>
+        <a href="<%= '/create/'+uid %>">
+          +
         </a>
-	  </li>
-	<% } %>
+      </li>
     </ul>
   </body>
 </html>

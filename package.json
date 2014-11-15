@@ -19,6 +19,11 @@
   "dependencies": {
     "express": "^4.10.2",
     "ejs": "^1.0.0",
-    "debug": "^2.1.0"
+    "debug": "^2.1.0",
+    "morgan": "^1.5.0",
+    "request": "^2.48.0"
+  },
+  "devDependencies": {
+    "morgan": "^1.5.0"
   }
 }

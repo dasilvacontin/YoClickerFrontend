@@ -10,3 +10,14 @@
 <link href='http://fonts.googleapis.com/css?family=Montserrat:700' rel='stylesheet' type='text/css'>
 <link rel="stylesheet" type="text/css" href="/css/normalize.css">
 <link rel="stylesheet" href="/css/styles.css">
+
+<script>
+function alert(words){
+  var iframe = document.createElement("IFRAME");
+  iframe.setAttribute("src", 'data:text/plain,');
+  iframe.style.display = 'none';
+  document.documentElement.appendChild(iframe);
+  window.frames[0].window.alert(words);
+  iframe.parentNode.removeChild(iframe);
+}
+</script>
