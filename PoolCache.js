@@ -1,26 +1,31 @@
 
 // PoolCache.js
 
-var debug = require('debug')('PoolCache');
+var debug = require('debug')('YoClicker:PoolCache');
 var utils = require('./utils');
 var config = require('./config');
 var cache = {};
 
-exports.get = function (id, cb)
-{
-	var poolData = cache[id];
 
-	if (cache[id] != null) {
+// Taste the rainbow
+exports.get = function (poolName, cb)
+{
+	var poolData = cache[poolName];
+
+	if (cache[poolName] != null) {
 		debug('cache hit');
 		return cb(null, poolData);
 	}
 
 	debug('cache miss');
-	getJSON(config.BACKEND_URL + '/pool/' + id, function (err, obj) {
+	var url = config.BACKEND_URL + '/poll/' + poolName;
+	debug('requesting: '+url);
+	utils.requestJSON(
+	url,
+	function (err, res, json) {
 		if (err) return cb(err);
-		var poolData = obj;
-		PoolCache.save(pid, poolData);
-		cb(null, poolData);
+		save(poolName, json);
+		cb(null, json);
 	});
 }
 

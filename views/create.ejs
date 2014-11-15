@@ -15,8 +15,8 @@
       <li>
         <input id="savePollButton" type="submit" value="SAVE">
       </li>
-      <li class="action">
-        <a href="<%= '/dashboard/'+uid %>">BACK</a>
+      <li id="cancelButton" class="action">
+        CANCEL
       </li>
     </ul>
     </form>
@@ -28,12 +28,13 @@
         </li>
         <li id="addAnswerButton">+</li>
         <li id="saveQuestionButton">SAVE</li>
-        <li id="deleteQuestionButton">DELETE</li>
+        <li class="action" id="deleteQuestionButton">DELETE</li>
       </ul>
     </div>
 
   <script>
 
+    var cancelButton = document.getElementById('cancelButton');
     var savePollButton = document.getElementById('savePollButton');
     var saveQuestionButton = document.getElementById('saveQuestionButton');
     var list = document.getElementById('list');
@@ -56,6 +57,11 @@
 
     function removeClass(d, c) {
       d.className = d.className.replace(c,'')
+    }
+
+    cancelButton.onclick = function () {
+      if (confirm("Are you sure you want to leave without saving changes?"))
+        window.location = "<%= '/dashboard/'+uid %>";
     }
 
     var currentQuestion = undefined;
@@ -114,9 +120,38 @@
     }
 
     savePollButton.onclick = function (e) {
-      enforcement();
-      alert('Your poll needs questions');
       e.preventDefault();
+      enforcement();
+      if (pollName.value.length == 0)
+        return alert('Your poll needs a name');
+
+      if (!isValidUsername(pollName.value))
+        return alert("Poll name must be a valid 'Yo' username.\nValid 'Yo' usernames begin with a letter and only have alphanumeric characters. 'YOCLK' will be appended to the end of the name.");
+
+      if (questions.length == 0)
+        return alert("Your poll needs to have at least one question");
+
+      for (var i = 0; i < questions.length; ++i) {
+        var q = questions[i];
+        if (!q.question || q.question.length == 0)
+          return alert('Questions need names');
+        for (var j = 0; j < q.answers.length; ++j) {
+          var a = q.answers[j];
+          if (!a || a.length == 0)
+            return alert('"'+q.question+'" has an empty answer.');
+        }
+      }
+
+      alert('TODO: Generate POST request');
+
+    }
+
+    function closeEditorWindow() {
+      answerInputs = [];
+      answerLis = [];
+
+      addClass(questionEditor, 'hide');
+      removeClass(list, 'hide');
     }
 
     deleteQuestionButton.onclick = function () {
@@ -124,18 +159,18 @@
         for (var i = 0; i < answerLis.length; ++i) {
           questionList.removeChild(answerLis[i]);
         }
-
+        questions.splice(currentQuestionIndex, 1);
+        list.removeChild(currentQuestion.dom);
+        closeEditorWindow();
       }
     }
 
     saveQuestionButton.onclick = function () {
 
       // Saves question name
-      var val = questionName.value;
-      if (val.length == 0) {
-        alert("Your question needs a name");
-        return;
-      }
+      var val = questionName.value.toUpperCase();
+      if (val.length == 0)
+        return alert("Your question needs a name");
       currentQuestion.question = val;
       currentQuestion.dom.innerHTML = val;
 
@@ -143,25 +178,34 @@
       var a = [];
       for (var i = 0; i < answerInputs.length; ++i) {
         var ans = answerInputs[i];
-        a.push(ans.value);
+        if (!ans.value || ans.value.length == 0)
+          return alert("There are empty answers");
+        a.push(ans.value.toUpperCase());
+      }
+      for (var i = 0; i < answerLis.length; ++i) {
         questionList.removeChild(answerLis[i]);
       }
-      answerInputs = [];
-      answerLis = [];
       currentQuestion.answers = a;
-
-      addClass(questionEditor, 'hide');
-      removeClass(list, 'hide');
+      
+      closeEditorWindow();
 
     }
 
-    var SUFFIX = "+YCLK"
+    var SUFFIX = "YOCLK";
     function enforcement() {
       pollName.value = pollName.value.toUpperCase();
       if (pollName.value.length > 0 && pollName.value.indexOf(SUFFIX) == -1) pollName.value += SUFFIX;
     }
-
     pollName.onblur = enforcement;
+    pollName.onfocus = function () {
+      if (pollName.value.length > 0) {
+        var i = pollName.value.indexOf(SUFFIX);
+        if (i != -1 && i == pollName.value.length - 5)
+          pollName.value = pollName.value.substring(0, i);
+      }
+    }
+    pollName.focus();
+    addQuestionButton.onclick();
 
   </script>
   </body>

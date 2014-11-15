@@ -12,9 +12,11 @@
           <%= answers[i] %>
       </a></li>
     <% } %>
+    <% if (shouldShowBack) {%>
     <li class="action">
       <a href="<%= '/voter/'+pollName+'/'+vid %>">BACK</a>
     </li>
+    <% } %>
     </ul>
     <script type="text/javascript">
       function voteForAnswerWithIndex(i) {

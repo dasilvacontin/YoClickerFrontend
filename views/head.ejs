@@ -12,12 +12,26 @@
 <link rel="stylesheet" href="/css/styles.css">
 
 <script>
-function alert(words){
-  var iframe = document.createElement("IFRAME");
-  iframe.setAttribute("src", 'data:text/plain,');
-  iframe.style.display = 'none';
-  document.documentElement.appendChild(iframe);
-  window.frames[0].window.alert(words);
-  iframe.parentNode.removeChild(iframe);
+function dummyIframe() {
+	var iframe = document.createElement("IFRAME");
+	iframe.setAttribute("src", 'data:text/plain,');
+	iframe.style.display = 'none';
+	document.documentElement.appendChild(iframe);
+	return iframe;
 }
+
+function alert(words) {
+	var iframe = dummyIframe();
+	window.frames[0].window.alert(words);
+	iframe.parentNode.removeChild(iframe);
+}
+
+function confirm(words) {
+	var iframe = dummyIframe();
+	var res = window.frames[0].window.confirm(words);
+	iframe.parentNode.removeChild(iframe);
+	return res;
+}
+
+var isValidUsername = function(n) { return !!n.match(/^[A-Z][0-9A-Z]*$/) }
 </script>

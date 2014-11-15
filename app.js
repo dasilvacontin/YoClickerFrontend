@@ -20,12 +20,12 @@ var MOCK_SHIT = true;
 
 app.param('uid', function (req, res, next, uid) {
 
-	debug('uid param');
+	debug('uid param, request account info (username, polls)');
 	req.uid = uid;
-
 	utils.requestJSON(
 	config.BACKEND_URL+'/account/'+uid,
 	function (err, res, json) {
+		debug('got account reply');
 		if (err) {
 			if (MOCK_SHIT) {
 				req.username = "MOCK_USERNAME";
@@ -51,7 +51,7 @@ app.param('pollName', function (req, res, next, pollName) {
 
 	req.pollName = pollName;
 
-	PoolCache.get(pollName, function (err, poolData) {
+	PoolCache.get(pollName+'/'+req.params.vid+'/', function (err, poolData) {
 		if (err) return next(err);
 		req.poolData = poolData;
 		req.questions = poolData.questions;
@@ -94,7 +94,7 @@ app.get('/voter/:pollName/:vid', function (req, res) {
 	} else if (req.questions.length == 1) {
 
 		// render question
-		res.redirect('/voter/'+pollName+'/0/'+vid);
+		res.redirect('/voter/'+req.pollName+'/0/'+req.vid);
 
 	} else throw new Error(500);
 
@@ -106,12 +106,13 @@ app.get('/voter/:pollName/:question/:vid', function (req, res) {
 		questionIndex: req.questionIndex,
 		question: req.question,
 		answers: req.answers,
+		shouldShowBack: (req.questions.length > 1),
 		vid: req.vid
 	});
 });
 
 function voteURL(pollName, questionIndex, answer, vid) {
-	return config.BACKEND_URL+'/vote/'+pollName+'/'+questionIndex+'/'+answer+'/'+vid;
+	return config.BACKEND_URL+'/vote/'+pollName+'/'+questionIndex+'/'+answer+'/'+vid+'/';
 }
 
 app.post('/poll/:pollName/:question/:answer/:vid', function (req, res) {
@@ -121,7 +122,10 @@ app.post('/poll/:pollName/:question/:answer/:vid', function (req, res) {
 
 		//valid request
 		utils.requestJSON(
-		voteURL(req.pollName, req.questionIndex, req.answer, req.vid),
+		{
+			url: voteURL(req.pollName, req.questionIndex, req.answer, req.vid),
+			method: 'POST'
+		},
 		function(err, r, json) {
 			if (err) {
 				debug('backend fail');
