@@ -19,7 +19,7 @@ exports.requestJSON = function (params, cb) {
 			debug('json parse fail, backend error');
 			return cb(new Error (500), res, body);
 		}
-		debug('success request');
+		debug('got response');
 		cb(err, res, body);
 	});
 }
@@ -51,7 +51,7 @@ var getBody = exports.getBody = function (req, cb) {
 			obj = JSON.parse(body);
 		} catch (e) {
 			// Backend server might have crashed during our request
-			debug('error parsing, backend error');
+			debug('error parsing, bad json syntax');
 			cb(new Error(503));
 		}
 		debug('got json successfully');
@@ -59,7 +59,7 @@ var getBody = exports.getBody = function (req, cb) {
 	});
 
 	req.on('error', function () {
-		debug('req error');
+		debug('transfer error');
 		cb(new Error(500));
 	});
 }

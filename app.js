@@ -18,6 +18,12 @@ app.engine('html', require('ejs').renderFile);
 
 var MOCK_SHIT = true;
 
+function mockAccount (req) {
+	debug('mocking account');
+	req.username = "MOCKUSER";
+	req.polls = [];
+}
+
 app.param('uid', function (req, res, next, uid) {
 
 	debug('uid param, request account info (username, polls)');
@@ -25,19 +31,16 @@ app.param('uid', function (req, res, next, uid) {
 	utils.requestJSON(
 	config.BACKEND_URL+'/account/'+uid,
 	function (err, res, json) {
-		debug('got account reply');
 		if (err) {
 			if (MOCK_SHIT) {
-				req.username = "MOCK_USERNAME";
-				req.polls = [];
+				mockAccount(req);
 				return next();
 			}
 			return next(err);
 		}
 		if (!json.username) {
-			if (!MOCK_SHIT) next(new Error(500));
-			req.username = "MOCK_NOUID_USER";
-			req.polls = [];
+			if (!MOCK_SHIT) next(new Error(401));
+			mockAccount(req);
 			return next();
 		}
 		req.username = json.username;
@@ -144,6 +147,33 @@ app.get('/create/:uid', function (req, res) {
 	});
 })
 
+app.post('/create/:uid', function (req, res) {
+	utils.getBody(req, function (err, json) {
+		if (err) return res.sendStatus(400);
+
+		//TODO: validate poll json
+
+		utils.requestJSON(
+		{
+			url: config.BACKEND_URL + '/create/'+req.uid+'/',
+			method: 'POST',
+			body: JSON.stringify(json)
+		},
+		function(err, r, json) {
+			if (err) {
+				debug('backend fail');
+				return res.sendStatus(503);
+			}
+			res.send(json.result+'');
+		});
+
+	});
+})
+
+app.get('/viewer/', function (req, res) {
+	res.render('viewer');
+});
+
 app.get('/dashboard/:uid', function (req, res) {
 	res.render('dashboard', {
 		uid: req.uid,
@@ -158,6 +188,7 @@ app.get('*', function (req, res) {
 
 app.use(function(err, req, res, next) {
 	debug(err);
+	debug('error code '+err.message);
     res.render('error', {statusCode: err.message});
 });
 

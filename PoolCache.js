@@ -24,6 +24,7 @@ exports.get = function (poolName, cb)
 	url,
 	function (err, res, json) {
 		if (err) return cb(err);
+		if (json.result === 0) return cb(new Error (404));
 		save(poolName, json);
 		cb(null, json);
 	});

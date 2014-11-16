@@ -1,3 +1,7 @@
+html, body {
+	height: 100%;
+}
+
 body {
 	background-color: #9B59B6;
 }
@@ -73,6 +77,16 @@ li, li > a, input {
 	text-align: center;
 }
 
+h1 {
+	font-family: 'Montserrat';
+	line-height: 100px;
+	font-size: 100px;
+	text-transform: uppercase;
+	color: white;
+	margin: 0px;
+	padding: 0px;
+}
+
 /* http://stackoverflow.com/questions/2610497/change-an-inputs-html5-placeholder-color-with-css */
 *::-webkit-input-placeholder {
     color: white;
@@ -90,13 +104,22 @@ li, li > a, input {
     color: white;
 }
 
-input[type=text], textarea {
-  outline: none;
+input[type=text], textarea, input:focus, input:active {
   padding: 0px;
   margin: 0px;
   border: none;
+  outline: 0;
+  outline-style:none;
+  outline-width:0;
 }
 
 .hide {
 	display: none;
+}
+
+.center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 }
