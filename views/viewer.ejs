@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<title>YoClicker - Viewer</title>
+<title>YoClicker - <%= pollName %></title>
 <%- include head.ejs %>
 <meta name="viewport" content="minimal-ui">
 <style type="text/css">
@@ -22,19 +22,13 @@
 <head>
 </head>
 <body>
-<div class='wrapper'>
-  <div class='chart' id="myChart"></div>
-</div>
 <script src="/js/runOnLoad.js"></script>
 <script src="/js/HighchartsAdapter.js" type="text/javascript"></script>
 <script src="/js/highcharts.src.js" type="text/javascript"></script>
 <script src='/js/yoChartTheme.js'></script>
 <script>
 
-  function getYoColor(i) {
-    return yoColors[i%yoColors.length];
-  }
-
+  /*
   var series = [{
     type: 'pie',
     data: [
@@ -52,22 +46,44 @@
         ['Mike McNeil', 80]
     ]
   }];
+  */
 
-  // create a new chart
-  runOnLoad(function(){
+  var questions = JSON.parse(unescape("<%- json %>"));
+
+  function newChart(i, question) {
+
+    var uid = 'chart'+i;
+
+    var w = document.createElement('div');
+    w.className = 'wrapper';
+    w.setAttribute('id', uid);
+    document.body.appendChild(w);
+
     new Highcharts.Chart({
     chart : {
-      renderTo : 'myChart',
+      renderTo : uid,
       type     : 'pie'
     },
     credits: {
       enabled: false
     },
     title: {
-        text: 'dotjs2014 best speaker award'
+        text: question.question
     },
-    series: series
+    series: [{
+      type: 'pie',
+      data: question.answers
+    }]
     });
+
+  }
+
+  // create a new chart
+  runOnLoad(function(){
+
+    for (var i = 0; i < questions.length; ++i)
+      newChart(i, questions[i]);
+
   });
 
 </script>

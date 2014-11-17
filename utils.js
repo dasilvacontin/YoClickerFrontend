@@ -5,33 +5,27 @@ var request = require('request');
 
 exports.requestJSON = function (params, cb) {
 	request(params, function (err, res, body) {
-		if (err) {
-			debug('request error');
-			return cb(err, res, body);
-		}
-		if (res.statusCode != 200) {
-			debug('statusCode != 200 -> ' + res.statusCode);
-			return cb(new Error (500), res, body);
-		}
-		try {
-			body = JSON.parse(body);
-		} catch (e) {
-			debug('json parse fail, backend error');
-			return cb(new Error (500), res, body);
-		}
-		debug('got response');
-		cb(err, res, body);
+		exports.fromRequestGetJSON(err, res, body, cb);
 	});
 }
 
 exports.fromRequestGetJSON = function (err, res, body, cb) {
-	if (err) return next(err);
-	if (res.statusCode != 200) return next(new Error (500));
+	if (err) {
+		debug('request error');
+		return cb(err, res, body);
+	}
+	if (res.statusCode != 200) {
+		debug('statusCode != 200 -> ' + res.statusCode);
+		return cb(new Error (500), res, body);
+	}
 	try {
 		body = JSON.parse(body);
 	} catch (e) {
-		return next(new Error (500));
+		debug('json parse fail, backend error');
+		return cb(new Error (500), res, body);
 	}
+	debug('got response');
+	cb(err, res, body);
 }
 
 /**

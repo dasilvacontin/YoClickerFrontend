@@ -24,6 +24,7 @@
     "request": "^2.48.0"
   },
   "devDependencies": {
-    "morgan": "^1.5.0"
+    "morgan": "^1.5.0",
+    "should": "^4.3.0"
   }
 }

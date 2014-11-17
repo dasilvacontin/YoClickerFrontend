@@ -8,9 +8,9 @@
     <ul>
       <li><%= question %></li>
     <% for (var i = 0; i < answers.length; i++) {%>
-      <li><a href="#" onclick="voteForAnswerWithIndex(<%= i %>)">
+      <li id="answer<%= i %>" onclick="voteForAnswerWithIndex(<%= i %>)">
           <%= answers[i] %>
-      </a></li>
+      </li>
     <% } %>
     <% if (shouldShowBack) {%>
     <li class="action">
@@ -19,7 +19,35 @@
     <% } %>
     </ul>
     <script type="text/javascript">
+      var voting = false;
+      var answerCache;
+      var answerElem;
+
+      function initVote(i) {
+        voting = true;
+        answerElem = document.getElementById('answer'+i);
+        answerCache = answerElem.innerHTML;
+        answerElem.innerHTML = 'VOTING';
+      }
+
+      function failedVote() {
+        answerElem.innerHTML = 'ERROR';
+        setTimeout(enableVote, 500);
+      }
+
+      function successVote() {
+        answerElem.innerHTML = 'VOTED';
+        setTimeout(enableVote, 500);
+      }
+
+      function enableVote () {
+        answerElem.innerHTML = answerCache;
+        voting = false;
+      }
+
       function voteForAnswerWithIndex(i) {
+        if (voting) return;
+        initVote(i);
         var voteRequest = new XMLHttpRequest();
         voteRequest.open(
           'POST',
@@ -28,6 +56,14 @@
         );
         voteRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
         voteRequest.send(i);
+        voteRequest.onerror = failedVote;
+        voteRequest.onload = function () {
+          var json;
+          try { json = JSON.parse(voteRequest.responseText); }
+          catch (e) { return failedVote(); }
+          if (json.result === 1) return successVote();
+          return failedVote();
+        }
       }
     </script>
   </body>

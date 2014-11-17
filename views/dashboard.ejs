@@ -9,7 +9,7 @@
       <li>HI <%= username %></li>
   	<% for (var i = 0; polls && i < polls.length; ++i) { %>
   	  <li>
-  	  	<a href="<%= '/edit/'+polls[i].pid+'/'+uid %>">
+  	  	<a href="<%= '/viewer/'+polls[i].pollname %>">
             <%= polls[i].pollname %>
           </a>
   	  </li>

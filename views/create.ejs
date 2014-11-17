@@ -24,7 +24,7 @@
     <div id="questionEditor" class="hide">
       <ul id="questionList">
         <li>
-          <input id="questionName" type="text" placeholder="NEW QUESTION">
+          <input id="questionName" type="text" placeholder="QUESTION NAME">
         </li>
         <li id="addAnswerButton">+</li>
         <li id="saveQuestionButton">SAVE</li>
@@ -126,7 +126,7 @@
         return alert('Your poll needs a name');
 
       if (!isValidUsername(pollName.value))
-        return alert("Poll name must be a valid 'Yo' username.\nValid 'Yo' usernames begin with a letter and only have alphanumeric characters. 'YOCLK' will be appended to the end of the name.");
+        return alert("Poll name must be a valid 'Yo' username.\nValid 'Yo' usernames begin with a letter and only have alphanumeric characters.");
 
       if (questions.length == 0)
         return alert("Your poll needs to have at least one question");
@@ -151,6 +151,7 @@
         postData.questions.push(obj);
       }
 
+      savePollButton.value = 'SAVING';
       var pollRequest = new XMLHttpRequest();
       pollRequest.open(
         'POST',
@@ -161,10 +162,25 @@
       pollRequest.send(JSON.stringify(postData));
       pollRequest.onerror = function (e) {
         alert("Request Error");
+        savePollButton.value = 'SAVE';
       }
       pollRequest.onload = function (e) {
+        savePollButton.value = 'SAVE';
         if (pollRequest.status != 200)
           return alert(pollRequest.responseText);
+        var json;
+        try { json = JSON.parse(pollRequest.responseText); }
+        catch (e) { return alert("Server Error"); }
+        if (json.result === 1) {
+          //poll created!
+          savePollButton.value = 'CREATED';
+          setTimeout(function () {
+            window.location = '/dashboard/' + '<%= uid %>';
+          }, 500);
+        } else {
+          console.log(json);
+          return alert(json.message);
+        }
       }
 
     }
@@ -214,12 +230,17 @@
 
     }
 
+    
     var SUFFIX = "YOCLK";
     function enforcement() {
       pollName.value = pollName.value.toUpperCase();
-      if (pollName.value.length > 0 && pollName.value.indexOf(SUFFIX) == -1) pollName.value += SUFFIX;
+      /*
+      if (pollName.value.length > 0 && pollName.value.indexOf(SUFFIX) == -1)
+        pollName.value += SUFFIX;
+      */
     }
     pollName.onblur = enforcement;
+    /*
     pollName.onfocus = function () {
       if (pollName.value.length > 0) {
         var i = pollName.value.indexOf(SUFFIX);
@@ -227,6 +248,7 @@
           pollName.value = pollName.value.substring(0, i);
       }
     }
+    */
     pollName.focus();
     addQuestionButton.onclick();
 

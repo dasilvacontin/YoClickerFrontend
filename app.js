@@ -54,6 +54,8 @@ app.param('pollName', function (req, res, next, pollName) {
 
 	req.pollName = pollName;
 
+	if (req.params.vid === undefined) return next();
+
 	PoolCache.get(pollName+'/'+req.params.vid+'/', function (err, poolData) {
 		if (err) return next(err);
 		req.poolData = poolData;
@@ -134,7 +136,7 @@ app.post('/poll/:pollName/:question/:answer/:vid', function (req, res) {
 				debug('backend fail');
 				return res.sendStatus(503);
 			}
-			res.send(json.result+'');
+			res.send(JSON.stringify(json));
 		});
 
 	});
@@ -153,9 +155,11 @@ app.post('/create/:uid', function (req, res) {
 
 		//TODO: validate poll json
 
+		var url = config.BACKEND_URL + '/create/'+req.uid+'/';
+		debug('request create poll to %s', url);
 		utils.requestJSON(
 		{
-			url: config.BACKEND_URL + '/create/'+req.uid+'/',
+			url: url,
 			method: 'POST',
 			body: JSON.stringify(json)
 		},
@@ -164,14 +168,45 @@ app.post('/create/:uid', function (req, res) {
 				debug('backend fail');
 				return res.sendStatus(503);
 			}
-			res.send(json.result+'');
+			debug('poll create reply from backend');
+			console.log(json);
+			res.send(JSON.stringify(json));
 		});
 
 	});
-})
+});
 
-app.get('/viewer/', function (req, res) {
-	res.render('viewer');
+app.get('/viewer/:pollName', function (req, res) {
+
+	return res.render('viewer', {
+		pollName: req.params.pollName,
+		json: escape(JSON.stringify([
+			{
+			  "question": "is m a fag",
+			  "answers":[
+			    ["obv", 450],
+			    ["signs points to yes", 1337]
+			  ]
+			},
+			{
+			  "question": "kek",
+			  "answers":[
+			    ["such kek", 451],
+			    ["wow", 142]
+			  ]
+			}
+		]))
+	});
+
+	var url = config.BACKEND_URL+'/results/'+req.params.pollName+'/';
+	utils.requestJSON(url, function (err, r, json) {
+		if (err) return res.render('error', {statusCode: err.message});
+		res.render('viewer', {
+			pollName: req.params.pollName,
+			json: JSON.stringify(json)
+		});	
+	});
+
 });
 
 app.get('/dashboard/:uid', function (req, res) {
