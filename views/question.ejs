@@ -16,6 +16,10 @@
     <li class="action">
       <a href="<%= '/voter/'+pollName+'/'+vid %>">BACK</a>
     </li>
+    <% }  else { %>
+    <li class="action">
+      <a href="<%= '/viewer/'+pollName %>">POLL RESULTS</a>
+    </li>
     <% } %>
     </ul>
     <script type="text/javascript">

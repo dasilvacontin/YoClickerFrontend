@@ -1,5 +1,5 @@
 var amethyst = '#9B59B6';
-var yoColors = ["#1ABC9C", "#2ECC71", "#3498DB", "#34495E", "#16A085", "#F1C40F", "#2980B9", "#8E44AD"];
+var yoColors = ["#2ECC71", "#3498DB", "#34495E", "#16A085", "#F1C40F", "#2980B9", "#8E44AD", "#1ABC9C"];
 
 Highcharts.theme = {
    colors: yoColors,
