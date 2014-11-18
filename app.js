@@ -178,9 +178,10 @@ app.post('/create/:uid', function (req, res) {
 
 app.get('/viewer/:pollName', function (req, res) {
 
+	/*
 	return res.render('viewer', {
 		pollName: req.params.pollName,
-		json: escape(JSON.stringify([
+		json: escape(JSON.stringify({result:[
 			{
 			  "question": "is m a fag",
 			  "answers":[
@@ -195,15 +196,18 @@ app.get('/viewer/:pollName', function (req, res) {
 			    ["wow", 142]
 			  ]
 			}
-		]))
+		]}))
 	});
+*/
 
 	var url = config.BACKEND_URL+'/results/'+req.params.pollName+'/';
 	utils.requestJSON(url, function (err, r, json) {
 		if (err) return res.render('error', {statusCode: err.message});
+		console.log(json);
 		res.render('viewer', {
 			pollName: req.params.pollName,
-			json: JSON.stringify(json)
+			json: escape(JSON.stringify(json)),
+			pollURL: url
 		});	
 	});
 

@@ -48,7 +48,9 @@
   }];
   */
 
-  var questions = JSON.parse(unescape("<%- json %>"));
+  var questions = JSON.parse(unescape("<%- json %>")).result;
+  var charts = [];
+  var pollURL = "<%= pollURL %>";
 
   function newChart(i, question) {
 
@@ -59,7 +61,7 @@
     w.setAttribute('id', uid);
     document.body.appendChild(w);
 
-    new Highcharts.Chart({
+    charts.push(new Highcharts.Chart({
     chart : {
       renderTo : uid,
       type     : 'pie'
@@ -74,7 +76,15 @@
       type: 'pie',
       data: question.answers
     }]
-    });
+    }));
+
+  }
+
+  function updateCharts(questions) {
+    console.log("updated charts");
+    for (var i = 0; i < questions.length; ++i) {
+      charts[i].series[0].setData(questions[i].answers);
+    }
 
   }
 
@@ -83,6 +93,28 @@
 
     for (var i = 0; i < questions.length; ++i)
       newChart(i, questions[i]);
+
+    setInterval(function () {
+
+      var pollRequest = new XMLHttpRequest();
+      pollRequest.open(
+        'GET',
+        pollURL,
+        true
+      );
+      //pollRequest.withCredentials = true;
+      pollRequest.send();
+      pollRequest.onerror = function () {
+        console.log("request error");
+      }
+      pollRequest.onload = function () {
+        var json;
+        try { json = JSON.parse(pollRequest.responseText); }
+        catch (e) { return console.log("backend error"); }
+        updateCharts(json.result);
+      }
+
+    }, 5000);
 
   });
 
