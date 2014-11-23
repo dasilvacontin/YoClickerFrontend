@@ -231,5 +231,6 @@ app.use(function(err, req, res, next) {
     res.render('error', {statusCode: err.message});
 });
 
-app.listen(3000);
+app.listen(config.PORT);
 debug("Yo, it's showtime");
+debug("Server started at port "+config.PORT);

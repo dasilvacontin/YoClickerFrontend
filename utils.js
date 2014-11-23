@@ -15,7 +15,7 @@ exports.fromRequestGetJSON = function (err, res, body, cb) {
 		return cb(err, res, body);
 	}
 	if (res.statusCode != 200) {
-		debug('statusCode != 200 -> ' + res.statusCode);
+		debug('request statusCode != 200 -> ' + res.statusCode);
 		return cb(new Error (500), res, body);
 	}
 	try {

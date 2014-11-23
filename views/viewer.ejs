@@ -43,27 +43,41 @@
 <p class="kek">YO THIS!<br>SHARE THE RESULTS</p>
 <script>
 
-  /*
-  var series = [{
-    type: 'pie',
-    data: [
-        ['Yehuda Katz', 450],
-        ['Angus Croll', 260],
-        ['Substack', 120],
-        ['Justin Meyer', 80],
-        ['Paul O’Shannessy', 450],
-        ['John-David Dalton', 260],
-        ['Domenic Denicola', 120],
-        ['Julien Lecomte', 80],
-        ['Soledad Penadés', 80],
-        ['Joe McCann', 80],
-        ['Charlie Robbins', 80],
-        ['Mike McNeil', 80]
-    ]
-  }];
-  */
+  // answer is an array of size 2,
+  // elem index 0 is answer title,
+  // elem index 1 is number of votes
+  var VOTES = 1;
+
+  function trimAnswers(answers) {
+
+    var hasValidAnswer = false,
+        answer;
+
+    for (var i = 0; i < answers.length; ++i) {
+      answer = answers[i];
+      if (answer[VOTES] > 0) {
+        hasValidAnswer = true;
+        break;
+      }
+    }
+
+    if (!hasValidAnswer) return;
+
+    for (var i = answers.length - 1; i >= 0; --i) {
+      answer = answers[i];
+      if (answer[VOTES] == 0)
+        answers.splice(i, 1);
+    }
+
+  }
 
   var questions = JSON.parse(unescape("<%- json %>")).result;
+  var question;
+  for (var i = 0; questions.length; ++i) {
+    question = questions[i];
+    trimAnswers(question.answers);
+  }
+
   var charts = [];
   var pollURL = "<%= pollURL %>";
 
@@ -98,7 +112,9 @@
   function updateCharts(questions) {
     console.log("updated charts");
     for (var i = 0; i < questions.length; ++i) {
-      charts[i].series[0].setData(questions[i].answers);
+      question = questions[i];
+      trimAnswers(question.answers);
+      charts[i].series[0].setData(question.answers);
     }
 
   }
